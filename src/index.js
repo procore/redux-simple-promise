@@ -50,28 +50,28 @@ export default function promiseMiddleware(resolvedName, rejectedName, actionTran
 
     // (2) Listen to promise and dispatch payload with new actionName
     return action.payload.promise.then(
-      (result) => {
+      function(result) {
         status = RESOLVED_NAME;
         dispatch(actionTransform({
           type: resolve(action.type),
           payload: result,
           meta: newAction.payload
         },
-        transId,
+        this,
         status ));
         return result;
-      },
-      (error) => {
+      }.bind(transId),
+      function(error) {
         status = REJECTED_NAME;
         dispatch(actionTransform({
           type: reject(action.type),
           payload: error,
           meta: newAction.payload
         },
-        transId,
+        this,
         status ));
         return error;
-      }
+      }.bind(transId)
     );
   };
 }
