@@ -28,6 +28,7 @@ export default function promiseMiddleware(resolvedName, rejectedName, actionTran
     // (1) Dispatch actionName with payload with arguments apart from promise
 
     // increment transactionId to be used by the original action and the async actions
+
     const transId = transactionId++;
 
     // Clone original action
@@ -50,28 +51,28 @@ export default function promiseMiddleware(resolvedName, rejectedName, actionTran
 
     // (2) Listen to promise and dispatch payload with new actionName
     return action.payload.promise.then(
-      function(result) {
+      (result) => {
         status = RESOLVED_NAME;
         dispatch(actionTransform({
           type: resolve(action.type),
           payload: result,
           meta: newAction.payload
         },
-        this,
+        transId,
         status ));
         return result;
-      }.bind(transId),
-      function(error) {
+      },
+      (error) => {
         status = REJECTED_NAME;
         dispatch(actionTransform({
           type: reject(action.type),
           payload: error,
           meta: newAction.payload
         },
-        this,
+        transId,
         status ));
         return error;
-      }.bind(transId)
+      }
     );
   };
 }
